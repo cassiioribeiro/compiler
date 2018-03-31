@@ -11,4 +11,5 @@ num num1;
 	{
 		not;
 	}
+	"@#das%&8*!}º Texto Literl"
 }
