@@ -1,6 +1,6 @@
 Program
+&
 {
-	/*testando o comentario
 	if(var1 ! 1){
 		"';
 	}
@@ -9,3 +9,4 @@ Program
 		;
 	}
 }
+/*testando o comentario

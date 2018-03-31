@@ -5,9 +5,10 @@ namespace Compilers
 {
     public static class ErrorMessage
     {
-        public static List<string> errorFound = new List<string>();
+        public static List<string> errorFound = new List<string>(); // Lista de erros encontraodos.
+
         /// <summary>
-        /// Erro padrão
+        /// Adiciona o erro na lista de erros encontrados.
         /// </summary>
         /// <param name="message">Mensagem do erro.</param>
         public static void Error(string message)
@@ -34,7 +35,7 @@ namespace Compilers
         /// <param name="message">Mensagem do erro.</param>
         public static void ErrorLexer(int n_line, int n_column, string message)
         {
-            string error = String.Format("Erro Lexico na linha {0} na coluna {1} : {2}\n", n_line, n_column, message);
+            string error = String.Format("Erro Lexico na linha {0} na coluna {1} : {2}.", n_line, n_column, message);
             AddError(error);
         }
 
@@ -49,7 +50,7 @@ namespace Compilers
         }
 
         /// <summary>
-        /// Erro inicializar a aplicação.
+        /// Erro ao inicializar o compilador.
         /// </summary>
         /// <param name="message">Mensagem do erro.</param>
         public static void ErrorStart(string message)
@@ -58,19 +59,38 @@ namespace Compilers
             AddError(error);
         }
 
+        /// <summary>
+        /// Adiciona a mensagem de erro dentro da lista de erros.
+        /// </summary>
+        /// <param name="error">Mensagem de erro.</param>
         public static void AddError(string error)
         {
             errorFound.Add(error);
         }
 
+        /// <summary>
+        /// Faz um foreach na lista de erros, exibindo todos os erros encontrados.
+        /// </summary>
         public static void ShowErrorFound()
         {
-            foreach (string item in errorFound)
+            Print("\nERROS ENCONTRADOS: ");
+            if (errorFound != null && errorFound.Count != 0)
             {
-                Print(item);
+                foreach (string item in errorFound)
+                {
+                    Print(item);
+                } 
+            }
+            else
+            {
+                Print("Nenhum erro identificado.");
             }
         }
 
+        /// <summary>
+        /// Mostra o erro no console.
+        /// </summary>
+        /// <param name="error">Mensagem de erro.</param>
         public static void Print(string error)
         {
             Console.WriteLine(error);

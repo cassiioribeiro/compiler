@@ -16,7 +16,7 @@ namespace Compilers
 
         /// <summary>
         /// Inicializa a análise lexica, abre o arquivo, faz a chamada para o metodo de impressão dos tokens,
-        /// fecha o arquivo e exibe uma mensagem de sucesso.
+        /// fecha o arquivo e exibe uma mensagem de termino.
         /// </summary>
         /// <param name="entrada"></param> 
         public Lexer(string entrada)
@@ -44,12 +44,12 @@ namespace Compilers
         }
 
         /// <summary>
-        /// Exibe todos os token que foram encontrados na leitura do arquivo.
+        /// Busca e depois exibe todos os token que foram encontrados na leitura do arquivo.
         /// </summary>         
         private void ImprimeToken()
         {
             Token token;
-
+            Message.Print("TOKENS ENCONTRADOS: ");
             // Enquanto não houver erros ou não for fim de arquivo.
             do
             {
@@ -66,13 +66,15 @@ namespace Compilers
                         TableOfSymbols.Add(token.Lexema.ToUpper(), token);
                     }
                 }
+
             } while (token != null && token.EnumToken != TokenEnum.EOF);
 
+            
             if (ErrorMessage.errorFound != null)
             {
                 ErrorMessage.ShowErrorFound();
             }
-
+            
             TableOfSymbols.ShowAllTableSymbols();
 
         }
@@ -162,7 +164,7 @@ namespace Compilers
                     Environment.Exit(3);
                 }
 
-                // Movimentaçaão do automato.
+                // Movimentação do automato.
                 switch (estado)
                 {
                     #region[CASE 0]
@@ -268,8 +270,8 @@ namespace Compilers
 
                         else
                         {
-                            SinalizaErro("Caractere invalido " + c + " na linha " + n_line + " e coluna " + n_column);
-                            return null;
+                            SinalizaErro("O caractere '" + c +"' é inválido!");
+                            estado = 0;
                         }
                         break;
                     #endregion
@@ -305,9 +307,10 @@ namespace Compilers
                         else
                         {
                             RetornaPonteiro();
-                            SinalizaErro("Token incompleto para o caractere ! na linha " + n_line + " e coluna " + n_column);
-                            return null;
+                            SinalizaErro("O Token está incompleto para o caractere '!'");
+                            estado = 0;
                         }
+                        break;
                     #endregion
 
                     #region [CASE 5]
@@ -426,8 +429,8 @@ namespace Compilers
                         }
                         else
                         {
-                            SinalizaErro("Padrao para num_const invalido na linha " + n_line + " coluna " + n_column);
-                            return null;
+                            SinalizaErro("Padrão para o NUM_CONST está inválido");
+                            estado = 0;
                         }
                         break;
                     #endregion
@@ -441,8 +444,8 @@ namespace Compilers
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            SinalizaErro("CONSTANTE_CHAR deve ser fechada com \' antes do fim de arquivo");
-                            return null;
+                            SinalizaErro("CONSTANTE_CHAR deve ser fechado com ''' antes do fim de arquivo");
+                            estado = 0;
                         }
                         else
                         {
@@ -474,8 +477,8 @@ namespace Compilers
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            SinalizaErro("LITERAL deve ser fechada com \" antes do fim de arquivo");
-                            return null;
+                            SinalizaErro("LITERAL deve ser fechado com '\"' antes do fim de arquivo");
+                            estado = 0;
                         }
                         else
                         {
@@ -501,8 +504,8 @@ namespace Compilers
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            SinalizaErro("Comentário de mais de uma linha deve ser fechado com */ antes do fim de arquivo");
-                            return null;
+                            SinalizaErro("Comentário com mais de uma linha deve ser fechado com '*/' antes do fim de arquivo");
+                            estado = 0;
                         }
                         else
                         {
@@ -519,8 +522,8 @@ namespace Compilers
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            SinalizaErro("Comentário de mais de uma linha deve ser fechado com / antes do fim de arquivo");
-                            return null;
+                            SinalizaErro("Comentário com mais de uma linha deve ser fechado com '/' antes do fim de arquivo");
+                            estado = 0;
                         }
                         else
                         {

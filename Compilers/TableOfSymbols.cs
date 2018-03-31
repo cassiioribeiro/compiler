@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Compilers
 {
     public class TableOfSymbols
-    {
-        private static Dictionary<String, Token> tabelaSimbolos;
+    {   
+        private static Dictionary<String, Token> tabelaSimbolos; // Tabela de simbolos
 
         /// <summary>
         /// Cria a tabela de simbolos.
@@ -82,7 +82,7 @@ namespace Compilers
         /// </summary>
         public static void ShowAllTableSymbols()
         {
-            Console.WriteLine("\nConteúdo contido na tabela de símbolos:");
+            Message.Print("\nCONTEÚDO CONTIDO NA TABELA DE SÍMBOLOS: ");
 
             foreach (var item in tabelaSimbolos)
             {

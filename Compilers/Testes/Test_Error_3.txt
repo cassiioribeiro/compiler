@@ -3,12 +3,12 @@ num var1;
 {
 	//testando o comentario
 	if(2 >= 2){
-		"Teste;
-		c';
+		Teste;
+		var1 = R$ 10;
 	}
 	else
 	{
-		var1 = 1;
+		var1 =! 1;
 	}
 	/*
 	comentario mais de uma linha

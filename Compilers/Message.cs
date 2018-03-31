@@ -30,9 +30,17 @@ namespace Compilers
         /// </summary>
         public static void EndOfBuild()
         {
-            Console.WriteLine("\nCompilação finalizada!");
+            Console.WriteLine("\nCOMPILAÇÃO FINALIZADA!");
             Console.ReadLine();
         }
-        
+
+        /// <summary>
+        /// Mostra a mensagem no console.
+        /// </summary>
+        /// <param name="message">Mensagem a ser exibida.</param>
+        public static void Print(string message)
+        {
+            Console.WriteLine(message);
+        }
     }
 }
