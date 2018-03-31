@@ -1,71 +1,38 @@
+using System;
+
 namespace Compilers
 {
     public class Token
     {
-        public TokenEnum Classe {
-            get { return Classe; }
-            private set { }
-        }
+        /// <summary>
+        /// Atributos do Token.
+        /// </summary>
+        public string Lexema { get; private set; }
+        public TokenEnum EnumToken { get; private set; }
+        public int Linha { get; private set; }
+        public int Coluna { get; private set; }
 
-        public string Lexema
+        /// <summary>
+        /// Construtor da classe, atribui valores para os atributos.
+        /// </summary>
+        /// <param name="enumToken">Enum do token</param>
+        /// <param name="lexema">Lexema do token </param>
+        /// <param name="linha">Linha do token</param>
+        /// <param name="coluna">Coluna do token</param>
+        public Token(TokenEnum enumToken, String lexema, int linha, int coluna)
         {
-            get { return Lexema; }
-            private set { }
-        }
-
-        public int Linha
-        {
-            get { return Linha; }
-            private set { }
-        }
-
-        public int Coluna
-        {
-            get { return Coluna; }
-            private set { }
-        }
-
-        public string IdValue
-        {
-            get { return IdValue; }
-            private set { }
-        }
-
-        public Token(TokenEnum classe, string lexema, int linha, int coluna) 
-        {
-            Classe = classe;
+            EnumToken = enumToken;
             Lexema = lexema;
             Linha = linha;
             Coluna = coluna;
         }
 
-        public void SetClasse(TokenEnum classe) 
-        {
-            Classe = classe;
-        }
-
-        public void SetLexema(string lexema) 
-        {
-            Lexema = lexema;
-        }
-
-        public void SetIdValue(string idValue) 
-        {    
-            IdValue = idValue;
-        }
-
-        public void SetLinha(int linha) 
-        {
-            Linha = linha;
-        }
-
-        public void SetColuna(int coluna) 
-        {
-            Coluna = coluna;
-        }
-
+        /// <summary>
+        /// Sobrepondo o ToString() do c#.
+        /// </summary>
+        /// <returns>Retorna uma string com a classe e o lexema.</returns>
         public override string ToString() {
-            return "<" + Classe + ", \"" + Lexema + "\">";
+            return String.Format("<{0}, \"{1}\">", EnumToken, Lexema);
         }
        
     }

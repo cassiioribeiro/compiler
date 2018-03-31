@@ -1,0 +1,17 @@
+Program Compiler
+char caracter;
+num numero;
+{
+	//Melhor matéria do curso é professor...
+	if(2 > 1){
+		caracter = 'D';
+	}
+	else
+	{
+		while(num==1)
+		{
+			write("Compilador é muito louco");
+			numero=2;
+		}
+	}
+}
