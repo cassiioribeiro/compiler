@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Compilers
 {
@@ -25,7 +25,7 @@ namespace Compilers
             {
                 instance_file = new FileStream(entrada, FileMode.Open, FileAccess.Read);
 
-                ImprimeToken();                
+                ImprimeToken();
 
                 FechaArquivo();
 
@@ -56,12 +56,12 @@ namespace Compilers
                 token = ProxToken();
 
                 // Imprime token
-                if (token != null) 
+                if (token != null)
                 {
                     Message.ShowToken(token, n_line, n_column);
 
                     // Verificar se existe o lexema na tabela de símbolos
-                    if (TableOfSymbols.ReturnToken(token.Lexema) == null) 
+                    if (TableOfSymbols.ReturnToken(token.Lexema) == null && token.EnumToken.ToString() == "ID")
                     {
                         TableOfSymbols.Add(token.Lexema.ToUpper(), token);
                     }
@@ -69,16 +69,16 @@ namespace Compilers
 
             } while (token != null && token.EnumToken != TokenEnum.EOF);
 
-            
+
             if (ErrorMessage.errorFound != null)
             {
                 ErrorMessage.ShowErrorFound();
             }
-            
+
             TableOfSymbols.ShowAllTableSymbols();
 
         }
-        
+
         /// <summary>
         /// Fecha o arquivo instance_file de input_data
         /// </summary>
@@ -99,15 +99,15 @@ namespace Compilers
         /// Chama o metodo ErrorLexer para exibir a mensagem de erro.
         /// </summary>
         /// <param name="mensagem">Mensagem para ser exibida no erro ocorrido.</param>
-        public void SinalizaErro(String mensagem)
-        {   
+        private void SinalizaErro(String mensagem)
+        {
             ErrorMessage.ErrorLexer(n_line, n_column, mensagem);
         }
 
         /// <summary>
         /// Volta uma posição do buffer de leitura.
         /// </summary>         
-        public void RetornaPonteiro()
+        private void RetornaPonteiro()
         {
             try
             {
@@ -126,10 +126,20 @@ namespace Compilers
         }
 
         /// <summary>
+        /// Verifica sé o caracter passado no paramentro é um caracter que está contido dentro do caracters ASCII
+        /// </summary>
+        /// <param name="c">Caracter que vai ser verificado</param>
+        /// <returns>Retorna um true ou false caso o caracter esteja dentro dos caracters ASCII</returns>
+        private static bool GetASCII(char c)
+        {
+            return Regex.IsMatch(c.ToString(), @"[\x20-\xFF]");
+        }
+
+        /// <summary>
         /// Obtém próximo token.
         /// </summary>
         /// <returns>Retorna o token que foi encontrado.</returns>
-        public Token ProxToken()
+        private Token ProxToken()
         {
             StringBuilder lexema = new StringBuilder();
             int estado = 0;
@@ -270,7 +280,7 @@ namespace Compilers
 
                         else
                         {
-                            SinalizaErro("O caractere '" + c +"' é inválido!");
+                            SinalizaErro("O caracter '" + c + "' é inválido!");
                             estado = 0;
                         }
                         break;
@@ -280,7 +290,7 @@ namespace Compilers
                     case 1:
                         if (Char.IsLetterOrDigit(c))
                         {
-                            lexema.Append(c); 
+                            lexema.Append(c);
                         }
                         else
                         {
@@ -304,11 +314,14 @@ namespace Compilers
                             estado = 4;
                             return new Token(TokenEnum.OP_NE, "!=", n_line, n_column);
                         }
+                        else if (lookahead == END_OF_FILE)
+                        {
+                            SinalizaErro("Token incompleto, necessita do '=' antes do fim do arquivo");
+                            estado = 0;
+                        }
                         else
                         {
-                            RetornaPonteiro();
-                            SinalizaErro("O Token está incompleto para o caractere '!'");
-                            estado = 0;
+                            SinalizaErro("O Token está incompleto para o caractere '!'");                            
                         }
                         break;
                     #endregion
@@ -437,19 +450,19 @@ namespace Compilers
 
                     #region [CASE 27]
                     case 27:
-                        if (c == '\'')
+                        if (GetASCII(c))
                         {
-                            estado = 25;
-                            return new Token(TokenEnum.CON_CHAR, lexema.ToString().ToUpper(), n_line, n_column);
+                            lexema.Append(c);
+                            estado = 33;
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            SinalizaErro("CONSTANTE_CHAR deve ser fechado com ''' antes do fim de arquivo");
+                            SinalizaErro("CONSTANTE_CHAR deve conter pelo menos um caracter antes do fechamento de  ''' e antes do fim de arquivo");
                             estado = 0;
                         }
-                        else
+                        if (!GetASCII(c))
                         {
-                            lexema.Append(c); 
+                            SinalizaErro("Caracter inválido, pois não está dentro da tabela ASCII");
                         }
                         break;
                     #endregion
@@ -470,25 +483,69 @@ namespace Compilers
 
                     #region [CASE 30]
                     case 30:
+                        if (GetASCII(c))
+                        {
+                            lexema.Append(c);
+                            estado = 31;
+                        }
+                        else if (lookahead == END_OF_FILE)
+                        {
+                            SinalizaErro("LITERAL incorreto, necessita de pelo menos um caracter ASCII e do fechamento com aspas duplas antes do fim do arquivo");
+                            estado = 0;
+                        }
+                        else if (c == '"')
+                        {
+                            SinalizaErro("LITERAL deve conter pelo menos um dos caracteres ASCII entre aspas duplas");
+                        }
+                        else if (!GetASCII(c))
+                        {
+                            SinalizaErro("Caracter inválido, pois não está dentro da tabela ASCII");
+                        }
+                        break;
+                    #endregion
+
+                    #region [CASE 31]
+                    case 31:
                         if (c == '"')
                         {
-                            estado = 25;
                             return new Token(TokenEnum.LIT, lexema.ToString().ToUpper(), n_line, n_column);
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            SinalizaErro("LITERAL deve ser fechado com '\"' antes do fim de arquivo");
+                            SinalizaErro("LITERAL incorreto, necessita do fechamento de aspas duplas antes do fim do arquivo");
                             estado = 0;
                         }
-                        else
+                        else if (GetASCII(c))
                         {
                             lexema.Append(c);
+                        }
+                        else if(!GetASCII(c))
+                        {
+                            SinalizaErro("Caracter inválido, pois não está dentro da tabela ASCII");
+                        }
+                        break;
+                    #endregion
+
+                    #region [CASE 33]
+                    case 33:
+                        if (c == '\'')
+                        {
+                            return new Token(TokenEnum.CON_CHAR, lexema.ToString().ToUpper(), n_line, n_column);
+                        }
+                        else if (lookahead == END_OF_FILE)
+                        {
+                            SinalizaErro("CONSTANTE_CHAR deve ser fechado com ''' antes do fim de arquivo");
+                            estado = 0;
+                        }
+                        else if(GetASCII(c))
+                        {
+                            SinalizaErro("CONSTANTE_CHAR não pode conter mais de um caracter");
                         }
                         break;
                     #endregion
 
                     #region [CASE 34]
-                        case 34:
+                    case 34:
                         if (c == '\n' || c == '\0')
                         {
                             estado = 0;
@@ -530,7 +587,7 @@ namespace Compilers
                             lexema.Append(c);
                         }
                         break;
-                    #endregion
+                        #endregion
                 }
             }
         }

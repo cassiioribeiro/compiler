@@ -3,12 +3,12 @@ num var1;
 {
 	//testando o comentario
 	if(2 >= 2){
-		"Teste";
+		"Teste de literal";
 		'c';
 	}
 	else
 	{
-		var1 = 1;
+		var1 = 111.111;
 	}
 	/*
 	comentario mais de uma linha
