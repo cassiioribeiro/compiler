@@ -12,7 +12,7 @@ namespace Compilers
         public static int n_line = 1; // contador de linhas
         public static int n_column = 1; // contador de linhas
         private FileStream instance_file; // referencia para o arquivo
-        private static TableOfSymbols tabelaSimbolos = new TableOfSymbols();  // tabela de simbolos
+        private static TableOfSymbols tabelaSimbolos = new TableOfSymbols(); // tabela de simbolos
 
         /// <summary>
         /// Inicializa a análise lexica, abre o arquivo, faz a chamada para o metodo de impressão dos tokens,
@@ -25,11 +25,11 @@ namespace Compilers
             {
                 instance_file = new FileStream(entrada, FileMode.Open, FileAccess.Read);
 
-                ImprimeToken();
+                // ImprimeToken();
 
-                FechaArquivo();
+                // FechaArquivo();
 
-                Message.EndOfBuild();
+                // Message.EndOfBuild();
             }
             catch (IOException ex)
             {
@@ -69,7 +69,6 @@ namespace Compilers
 
             } while (token != null && token.EnumToken != TokenEnum.EOF);
 
-
             if (ErrorMessage.errorFound != null)
             {
                 ErrorMessage.ShowErrorFound();
@@ -101,7 +100,8 @@ namespace Compilers
         /// <param name="mensagem">Mensagem para ser exibida no erro ocorrido.</param>
         private void SinalizaErro(String mensagem)
         {
-            ErrorMessage.ErrorLexer(n_line, n_column, mensagem);
+            //ErrorMessage.ErrorLexer(n_line, n_column, mensagem);
+            Console.WriteLine("[ERRO LEXICO] na linha " + n_line + " na coluna " + n_column + " : " + mensagem + ".");
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Compilers
         /// Obtém próximo token.
         /// </summary>
         /// <returns>Retorna o token que foi encontrado.</returns>
-        private Token ProxToken()
+        public Token ProxToken()
         {
             StringBuilder lexema = new StringBuilder();
             int estado = 0;
@@ -158,15 +158,6 @@ namespace Compilers
                         c = (char)lookahead;
                         n_column++;
                     }
-                    if (c == '\n')
-                    {
-                        n_line++;
-                        n_column = 1;
-                    }
-                    else if (c == '\t')
-                    {
-                        n_column += 3;
-                    }
                 }
                 catch (IOException ioex)
                 {
@@ -183,7 +174,15 @@ namespace Compilers
                             return new Token(TokenEnum.EOF, "EOF", n_line, n_column);
                         else if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
                         {
-                            // Permance no estado = 1.                            
+                            if (c == '\n')
+                            {
+                                n_line++;
+                                n_column = 1;
+                            }
+                            else if (c == '\t')
+                            {
+                                n_column += 3;
+                            }
                         }
                         else if (Char.IsLetter(c))
                         {
@@ -277,7 +276,6 @@ namespace Compilers
                             estado = 27;
                         }
                         #endregion
-
                         else
                         {
                             SinalizaErro("O caracter '" + c + "' é inválido!");
@@ -297,11 +295,14 @@ namespace Compilers
                             estado = 2;
                             RetornaPonteiro();
                             Token token = TableOfSymbols.ReturnToken(lexema.ToString().ToUpper());
-
+                            
                             if (token == null)
                             {
                                 return new Token(TokenEnum.ID, lexema.ToString().ToUpper().ToUpper(), n_line, n_column);
                             }
+
+                            token.Linha = n_line;
+                            token.Coluna = n_column;
                             return token;
                         }
                         break;
@@ -321,7 +322,7 @@ namespace Compilers
                         }
                         else
                         {
-                            SinalizaErro("O Token está incompleto para o caractere '!'");                            
+                            SinalizaErro("O Token está incompleto para o caractere '!'");
                         }
                         break;
                     #endregion
@@ -378,7 +379,7 @@ namespace Compilers
                             RetornaPonteiro();
                             return new Token(TokenEnum.OP_ASS, "=", n_line, n_column);
                         }
-                    #endregion                  
+                    #endregion
 
                     #region [CASE 18]
                     #endregion
@@ -431,7 +432,7 @@ namespace Compilers
                             return new Token(TokenEnum.CON_NUM, lexema.ToString().ToUpper(), n_line, n_column);
                         }
                         break;
-                    #endregion                    
+                    #endregion
 
                     #region [CASE 26]
                     case 26:
@@ -479,7 +480,7 @@ namespace Compilers
                             return new Token(TokenEnum.CON_NUM, lexema.ToString().ToUpper(), n_line, n_column);
                         }
                         break;
-                    #endregion               
+                    #endregion
 
                     #region [CASE 30]
                     case 30:
@@ -519,7 +520,7 @@ namespace Compilers
                         {
                             lexema.Append(c);
                         }
-                        else if(!GetASCII(c))
+                        else if (!GetASCII(c))
                         {
                             SinalizaErro("Caracter inválido, pois não está dentro da tabela ASCII");
                         }
@@ -537,7 +538,7 @@ namespace Compilers
                             SinalizaErro("CONSTANTE_CHAR deve ser fechado com ''' antes do fim de arquivo");
                             estado = 0;
                         }
-                        else if(GetASCII(c))
+                        else if (GetASCII(c))
                         {
                             SinalizaErro("CONSTANTE_CHAR não pode conter mais de um caracter");
                         }
@@ -549,6 +550,8 @@ namespace Compilers
                         if (c == '\n' || c == '\0')
                         {
                             estado = 0;
+                            n_line++;
+                            n_column = 1;
                         }
                         break;
                     #endregion
@@ -564,9 +567,10 @@ namespace Compilers
                             SinalizaErro("Comentário com mais de uma linha deve ser fechado com '*/' antes do fim de arquivo");
                             estado = 0;
                         }
-                        else
+                        else if (c == '\n')
                         {
-                            lexema.Append(c);
+                            n_line++;
+                            n_column = 1;
                         }
                         break;
                     #endregion
@@ -581,10 +585,6 @@ namespace Compilers
                         {
                             SinalizaErro("Comentário com mais de uma linha deve ser fechado com '/' antes do fim de arquivo");
                             estado = 0;
-                        }
-                        else
-                        {
-                            lexema.Append(c);
                         }
                         break;
                         #endregion

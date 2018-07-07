@@ -1,0 +1,9 @@
+program parser
+{
+    while()
+
+	if(var1 == var2)
+    {
+
+    }
+}

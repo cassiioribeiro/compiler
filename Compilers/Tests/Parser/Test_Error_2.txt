@@ -1,0 +1,9 @@
+Program Teste1
+num teste;
+{	
+	#
+	if(num1 == num1)
+	{
+		num1++;
+	}
+}

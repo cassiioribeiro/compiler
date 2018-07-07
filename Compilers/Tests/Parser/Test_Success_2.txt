@@ -1,0 +1,11 @@
+program Teste
+num var1;
+num var2;
+num var3;
+{
+//comentário de uma linha
+while(var1 == var2)
+{
+    var3 = var3 + var1;
+};
+}

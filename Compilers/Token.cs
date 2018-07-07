@@ -9,8 +9,8 @@ namespace Compilers
         /// </summary>
         public string Lexema { get; private set; }
         public TokenEnum EnumToken { get; private set; }
-        public int Linha { get; private set; }
-        public int Coluna { get; private set; }
+        public int Linha { get; set; }
+        public int Coluna { get; set; }
 
         /// <summary>
         /// Construtor da classe, atribui valores para os atributos.

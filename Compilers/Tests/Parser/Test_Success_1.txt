@@ -1,0 +1,17 @@
+program Teste1
+num num1,num2;
+char char2,char3;
+/*
+	Testando comentário de multiplas linhas
+*/
+{
+	if(num1 == 0)
+	{
+		num1 = 10;
+		char2 = 'b';	
+	};
+	
+	read char2;
+	
+	write "Testando write";
+}
